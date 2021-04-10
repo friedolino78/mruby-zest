@@ -126,6 +126,7 @@ Widget {
             TextBox  { label: "waveshaping"}
             Selector { extern: base_osc.extern + "Pwaveshapingfunction"}
             HSlider  { extern: base_osc.extern + "Pwaveshaping"}
+            HSlider  { extern: base_osc.extern + "Pwsoffset"}
 
             //pad
             Widget   {}

@@ -9,6 +9,7 @@ Widget {
     property Int      curOff: 0
     property Float    depth: 0.0
     property Float    period: 0.5
+    
 
     function cb() { whenValue.call if whenValue }
 
@@ -129,11 +130,19 @@ Widget {
     function onMouseMove(ev) {
         @active_buttons ||= []
         fine = root.fine_mode ? 0.05 : 1.0
+        snap = root.snap_mode
         nactive = root.activeWidget(ev.pos.x, ev.pos.y)
         if(@prev && @active_widget == nactive && @active_buttons.include?(:leftButton))
             delta = +(ev.pos.y - @prev.y)
             return if nactive.class != Qml::Slider
-            @active_widget.updatePos(fine*delta/@active_widget.dragScale)
+            if snap
+                puts( "@active_widget: " + @active_widget.inspect)
+                @active_widget.pos += fine*delta/@active_widget.dragScale
+                puts("@active_widget.pos: " + @active_widget.pos)
+                @active_widget.updatePosAbs((@active_widget.pos*38).round()/38)
+            else
+                @active_widget.updatePos(fine*delta/@active_widget.dragScale)
+            end
             @prev = ev.pos
         elsif(@prev && @active_buttons.include?(:leftButton))
             @active_widget = :dummy
@@ -223,19 +232,21 @@ Widget {
                 when :amplitude
                     1.0
                 when :frequency
-                    1.0/2400.0
+                    1.0/1900.0
                 when :filter
                     1.0/4.0
                 end
             inds = []
             pts.each_with_index do |pt, id|
                 pts[id] *= scale if id%2==1
+                pts[id] *= 4 if id%2==0
                 pts[id] -= seqedit.curOff if id%2==0
                 inds.push(id) if pts[id] > 0 && pts[id] < 32 && id%2==0
             end
 
-            draw_grid(vg, 24, 12, 10, 10, w*4, h/2)
-            Draw::WaveForm::overlay(vg, Rect.new(0,5,w*4,(h*0.94)/2-5), pts[inds[0]..inds[-1]+1]) if !inds.empty?
+            draw_pitchgrid(vg, 38, 0, 0, w, (h*0.94))
+            Draw::WaveForm::overlay(vg, Rect.new(0,5,w,(h*0.94)/2-5), pts[inds[0]..inds[-1]+1]) if !inds.empty?
+            
         }
     }
 

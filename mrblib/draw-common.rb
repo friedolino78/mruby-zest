@@ -988,7 +988,7 @@ def draw_grid(vg, r, c, x, y, w, h)
 
     (1..r).each do |ln|
         vg.path do |v|
-            off = (ln/r)*(h/2)
+            off = (ln*1.0/r)*(h/2.0)
             vg.move_to(x,   y + h/2+off);
             vg.line_to(x+w, y + h/2+off)
             vg.move_to(x,   y + h/2-off);
@@ -1017,6 +1017,31 @@ def draw_grid(vg, r, c, x, y, w, h)
                 v.stroke_width 1.0
             end
             v.stroke
+        end
+    end
+end
+
+#Draw a linear y grid
+def draw_pitchgrid(vg, r, x, y, w, h)
+    light_fill = NVG.rgba(0xcc,0xff,0x75,160)
+    med_fill   = NVG.rgba(0xcc,0xff,0x75,200)
+
+    (1..r).each do |ln|
+        vg.path do |v|
+            off = (ln*1.0/r)*h
+            vg.move_to(x,   y + off);
+            vg.line_to(x+w, y + off)
+
+            case ((ln+5.0)%12).to_i
+                when 1,3,5,7,8,10
+                    v.stroke_color light_fill
+                    v.stroke_width 2.0
+                    v.stroke
+                when 0
+                    v.stroke_color med_fill
+                    v.stroke_width 2.0
+                    v.stroke
+                end
         end
     end
 end
